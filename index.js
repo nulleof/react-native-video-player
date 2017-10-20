@@ -201,7 +201,7 @@ export default class VideoPlayer extends Component {
   onToggleFullScreen() {
     if(Platform.OS === "android")
     {
-      var uri = this.props.video.uri;
+      var uri = this.props.video;
       var position = Math.floor(this.state.duration * this.state.progress);
       this.showFullscreenAndroid(uri, position);
     }
