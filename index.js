@@ -203,7 +203,7 @@ export default class VideoPlayer extends Component {
     {
       var uri = this.props.video.uri;
       var position = Math.floor(this.state.duration * this.state.progress);
-      this.showFullscreenAndroid(uri, position);
+      this.showFullscreenAndroid(uri, this.props.isLive ? 0 : position);
     }
     else
     {
@@ -215,7 +215,7 @@ export default class VideoPlayer extends Component {
     try {
       position = await NativeModules.BridgeModule.showFullscreen(uri, position);
       // If position is zero, stop.
-      if (position == 0) {
+      if (position == 0 && !this.props.isLive) {
         this.setState({ isPlaying: false });
       } else {
         position = Math.floor(position / 1000);
@@ -520,6 +520,7 @@ VideoPlayer.propTypes = {
   disableSeek: PropTypes.bool,
   pauseOnPress: PropTypes.bool,
   fullScreenOnLongPress: PropTypes.bool,
+  isLive: PropTypes.bool,
   customStyles: PropTypes.shape({
     wrapper: ViewPropTypes.style,
     video: Video.propTypes.style,
@@ -555,4 +556,5 @@ VideoPlayer.defaultProps = {
   pauseOnPress: false,
   fullScreenOnLongPress: false,
   customStyles: {},
+  isLive: false,
 };
