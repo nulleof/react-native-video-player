@@ -202,7 +202,7 @@ export default class VideoPlayer extends Component {
     if(Platform.OS === "android")
     {
       var uri = this.props.video.uri;
-      var position = Math.floor(this.state.duration * this.state.progress);
+      var position = this.state.duration * this.state.progress;
       this.showFullscreenAndroid(uri, this.props.isLive ? 0 : position);
     }
     else
@@ -218,7 +218,7 @@ export default class VideoPlayer extends Component {
       if (position == 0 && !this.props.isLive) {
         this.setState({ isPlaying: false });
       } else {
-        position = Math.floor(position / 1000);
+        position = position / 1000;
         let progress = position / this.state.duration;
         this.setState({progress,});
         this.player.seek(position);
