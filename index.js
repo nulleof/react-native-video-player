@@ -83,6 +83,10 @@ const styles = StyleSheet.create({
   overlayButton: {
     flex: 1,
   },
+  liveText: {
+    flex: 1,
+    color: 'white',
+  },
 });
 
 export default class VideoPlayer extends Component {
@@ -338,7 +342,16 @@ export default class VideoPlayer extends Component {
   }
 
   renderSeekBar(fullWidth) {
-    const { customStyles, disableSeek } = this.props;
+    const { customStyles, disableSeek, isLive } = this.props;
+
+    if (isLive) {
+      return (
+        <Text style={styles.liveText}>
+          Live
+        </Text>
+      );
+    }
+
     return (
       <View
         style={[
@@ -531,6 +544,7 @@ VideoPlayer.propTypes = {
   onPlayPress: PropTypes.func,
   onHideControls: PropTypes.func,
   onShowControls: PropTypes.func,
+  isLive: PropTypes.bool,
 };
 
 VideoPlayer.defaultProps = {
