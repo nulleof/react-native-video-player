@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Image, ImageBackground, Platform, StyleSheet, TouchableOpacity, View, ViewPropTypes } from 'react-native';
+import { Image, ImageBackground, Platform, StyleSheet, TouchableOpacity, View, ViewPropTypes, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Video from 'react-native-video'; // eslint-disable-line
+import moment from 'moment';
 
 const BackgroundImage = ImageBackground || Image; // fall back to Image if RN < 0.46
 
@@ -87,6 +88,14 @@ const styles = StyleSheet.create({
     flex: 1,
     color: 'white',
   },
+  timeTextLeft: {
+    color: 'white',
+    marginRight: 10,
+  },
+  timeTextRight: {
+    color: 'white',
+    marginLeft: 10,
+  },
 });
 
 export default class VideoPlayer extends Component {
@@ -98,6 +107,7 @@ export default class VideoPlayer extends Component {
       isPlaying: props.autoplay,
       width: 200,
       progress: 0,
+      currentTime: 0,
       isMuted: props.defaultMuted,
       isControlsVisible: !props.hideControlsOnStart,
       duration: 0,
@@ -165,6 +175,7 @@ export default class VideoPlayer extends Component {
     }
     this.setState({
       progress: event.currentTime / (this.props.duration || this.state.duration),
+      currentTime: event.currentTime,
     });
   }
 
@@ -342,15 +353,7 @@ export default class VideoPlayer extends Component {
   }
 
   renderSeekBar(fullWidth) {
-    const { customStyles, disableSeek, isLive } = this.props;
-
-    if (isLive) {
-      return (
-        <Text style={styles.liveText}>
-          Live
-        </Text>
-      );
-    }
+    const { customStyles, disableSeek } = this.props;
 
     return (
       <View
@@ -395,8 +398,55 @@ export default class VideoPlayer extends Component {
     );
   }
 
+  renderLiveText(isLive) {
+    if (isLive) {
+      return (
+        <Text style={styles.liveText}>
+          Live
+        </Text>
+      );
+    }
+    return null;
+  }
+
+  pad(num, size) {
+    let snum = "" + num;
+    size = Math.max(snum.length, size);
+    let s = "000000000" + num;
+    return s.substr(s.length - size);
+  }
+
+  renderCurTime(isLive) {
+    if (isLive || !this.state.currentTime) {
+      return null;
+    }
+
+    const curTime = moment.duration(this.state.currentTime * 1000);
+
+    return (
+      <Text style={styles.timeTextLeft}>
+        {this.pad(Math.floor(curTime.asMinutes()), 2) + ':' + this.pad(curTime.seconds(), 2)}
+      </Text>
+    );
+  }
+
+  renderDurTime(isLive) {
+    if (isLive || !this.state.duration) {
+      return null;
+    }
+
+    const durTime = moment.duration(this.state.duration * 1000);
+
+    return (
+      <Text style={styles.timeTextRight}>
+        {this.pad(Math.floor(durTime.asMinutes()), 2) + ':' + this.pad(durTime.seconds(), 2)}
+      </Text>
+    );
+  }
+
   renderControls() {
-    const { customStyles } = this.props;
+    const { customStyles, isLive } = this.props;
+
     return (
       <View style={[styles.controls, customStyles.controls]}>
         <TouchableOpacity
@@ -409,7 +459,10 @@ export default class VideoPlayer extends Component {
             size={32}
           />
         </TouchableOpacity>
-        {this.renderSeekBar()}
+        {this.renderCurTime(isLive)}
+        {this.renderLiveText(isLive)}
+        {isLive ? null : this.renderSeekBar()}
+        {this.renderDurTime(isLive)}
         {this.props.muted ? null : (
           <TouchableOpacity onPress={this.onMutePress} style={customStyles.controlButton}>
             <Icon
@@ -431,6 +484,7 @@ export default class VideoPlayer extends Component {
       pauseOnPress,
       fullScreenOnLongPress,
       customStyles,
+      isLive,
       ...props
     } = this.props;
     return (
@@ -468,7 +522,7 @@ export default class VideoPlayer extends Component {
           />
         </View>
         {((!this.state.isPlaying) || this.state.isControlsVisible)
-          ? this.renderControls() : this.renderSeekBar(true)}
+          ? this.renderControls() : (isLive ? null : this.renderSeekBar(true))}
       </View>
     );
   }

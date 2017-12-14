@@ -16,6 +16,9 @@
   "author": "Corné Dorrestijn <contact@corne.info>",
   "license": "ISC",
   "repository": "cornedor/react-native-video-player",
+  "dependencies": {
+    "moment": "^2.18.1"
+  },
   "peerDependencies": {
     "prop-types": "*",
     "react": "*",
