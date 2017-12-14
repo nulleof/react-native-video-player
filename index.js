@@ -113,7 +113,6 @@ export default class VideoPlayer extends Component {
     this.onPlayPress = this.onPlayPress.bind(this);
     this.onMutePress = this.onMutePress.bind(this);
     this.showControls = this.showControls.bind(this);
-    this.onToggleFullScreen = this.onToggleFullScreen.bind(this);
     this.onSeekBarLayout = this.onSeekBarLayout.bind(this);
     this.onSeekGrant = this.onSeekGrant.bind(this);
     this.onSeekRelease = this.onSeekRelease.bind(this);
@@ -210,10 +209,6 @@ export default class VideoPlayer extends Component {
       isMuted: !this.state.isMuted,
     });
     this.showControls();
-  }
-
-  onToggleFullScreen() {
-    this.player.presentFullscreenPlayer();
   }
 
   onSeekBarLayout({ nativeEvent }) {
@@ -411,15 +406,6 @@ export default class VideoPlayer extends Component {
             />
           </TouchableOpacity>
         )}
-        {(Platform.OS === 'android' || this.props.disableFullscreen) ? null : (
-          <TouchableOpacity onPress={this.onToggleFullScreen} style={customStyles.controlButton}>
-            <Icon
-              style={[styles.extraControl, customStyles.controlIcon]}
-              name="fullscreen"
-              size={32}
-            />
-          </TouchableOpacity>
-        )}
       </View>
     );
   }
@@ -459,17 +445,13 @@ export default class VideoPlayer extends Component {
             { marginTop: -this.getSizeStyles().height },
           ]}
         >
-          <TouchableOpacity 
-            style={styles.overlayButton} 
+          <TouchableOpacity
+            style={styles.overlayButton}
             onPress={() => {
               this.showControls();
               if (pauseOnPress)
                 this.onPlayPress();
             }}
-            onLongPress={() => {
-              if (fullScreenOnLongPress && Platform.OS !== 'android')
-                this.onToggleFullScreen();
-            }} 
           />
         </View>
         {((!this.state.isPlaying) || this.state.isControlsVisible)
